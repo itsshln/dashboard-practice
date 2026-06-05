@@ -1,11 +1,15 @@
+import streamlit as st
 from sqlalchemy import create_engine
 
-DB_USER = "postgres"
-DB_PASSWORD = "p5432"
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_NAME = "practice_db"
-
 engine = create_engine(
-    f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    f"postgresql+psycopg2://"
+    f"{st.secrets['DB_USER']}:"
+    f"{st.secrets['DB_PASSWORD']}@"
+    f"{st.secrets['DB_HOST']}:"
+    f"{st.secrets['DB_PORT']}/"
+    f"{st.secrets['DB_NAME']}",
+    connect_args={
+        "sslmode": "require",
+        "options": "-c search_path=public"
+    }
 )
