@@ -9,7 +9,6 @@ engine = create_engine(
     f"{st.secrets['DB_PORT']}/"
     f"{st.secrets['DB_NAME']}",
     connect_args={
-        "sslmode": "require",
-        "options": "-c search_path=public"
+        "sslmode": "require"
     }
 )
