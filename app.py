@@ -66,6 +66,20 @@ with st.sidebar:
         ["Все"] + departments_filter["name"].tolist()
     )
 
+    students_filter = pd.read_sql(
+        """
+        SELECT student_id, full_name
+        FROM public.students
+        ORDER BY student_id
+        """,
+        engine
+    )
+
+    selected_student = st.sidebar.selectbox(
+        "Студент",
+        ["Все студенты"] + students_filter["full_name"].tolist()
+    )
+
     st.markdown("---")
 
     st.markdown(
@@ -86,19 +100,6 @@ with st.sidebar:
 
         • Реестр студентов
         """
-    )
-    students_filter = pd.read_sql(
-    """
-    SELECT student_id, full_name
-    FROM public.students
-    ORDER BY full_name
-    """,
-    engine
-    )
-
-    selected_student = st.sidebar.selectbox(
-    "Студент",
-    ["Все студенты"] + students_filter["full_name"].tolist()
     )
 
 #HEADER
