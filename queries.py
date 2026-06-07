@@ -24,19 +24,29 @@ def build_department_condition(department):
 
     return f"d.name = '{department}'"
 
+def build_student_condition(student):
+
+    if student == "Все студенты":
+        return "1=1"
+
+    return f"s.full_name = '{student}'"
+
 #KPI
 
-def get_total_students():
+def get_total_students(student):
 
-    query = """
+    query = f"""
     SELECT COUNT(*) AS total_students
-    FROM students;
+
+    FROM students s
+
+    WHERE {build_student_condition(student)}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_total_requests(period, department):
+def get_total_requests(period, department, student):
 
     query = f"""
     SELECT COUNT(*) AS total_requests
@@ -46,14 +56,18 @@ def get_total_requests(period, department):
     LEFT JOIN departments d
         ON p.department_id = d.department_id
 
+    LEFT JOIN students s
+        ON p.student_id = s.student_id
+
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_active_practices(period, department):
+def get_active_practices(period, department, student):
 
     query = f"""
     SELECT COUNT(*) AS active_count
@@ -63,15 +77,19 @@ def get_active_practices(period, department):
     LEFT JOIN departments d
         ON p.department_id = d.department_id
 
+    LEFT JOIN students s
+        ON p.student_id = s.student_id
+
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
       AND p.current_status='Практика активна'
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_completed_practices(period, department):
+def get_completed_practices(period, department, student):
 
     query = f"""
     SELECT COUNT(*) AS completed_count
@@ -81,15 +99,19 @@ def get_completed_practices(period, department):
     LEFT JOIN departments d
         ON p.department_id = d.department_id
 
+    LEFT JOIN students s
+        ON p.student_id = s.student_id
+
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
       AND p.current_status='Практика завершена'
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_avg_processing_time(period, department):
+def get_avg_processing_time(period, department, student):
 
     query = f"""
     SELECT
@@ -108,23 +130,27 @@ def get_avg_processing_time(period, department):
     LEFT JOIN departments d
         ON p.department_id=d.department_id
 
+    LEFT JOIN students s
+        ON p.student_id = s.student_id
+
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
       AND approved_at IS NOT NULL
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_document_return_rate():
+def get_document_return_rate(period, department, student):
 
-    query = """
+    query = f"""
     SELECT
         COALESCE(
             ROUND(
                 (
                     COUNT(*) FILTER (
-                        WHERE is_valid = FALSE
+                        WHERE doc.is_valid = FALSE
                     ) * 100.0
                     /
                     NULLIF(COUNT(*),0)
@@ -133,13 +159,27 @@ def get_document_return_rate():
             ),
             0
         ) AS return_rate
-    FROM documents;
+
+    FROM documents doc
+
+    JOIN practice_requests p
+        ON doc.request_id = p.request_id
+
+    JOIN departments d
+        ON p.department_id = d.department_id
+
+    JOIN students s
+        ON p.student_id = s.student_id
+
+    WHERE {build_period_condition(period)}
+      AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_student_satisfaction(period, department):
+def get_student_satisfaction(period, department, student):
 
     query = f"""
     SELECT
@@ -159,14 +199,18 @@ def get_student_satisfaction(period, department):
     JOIN departments d
         ON r.department_id=d.department_id
 
+    JOIN students s
+        ON r.student_id=s.student_id
+
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_department_satisfaction(period, department):
+def get_department_satisfaction(period, department, student):
 
     query = f"""
     SELECT
@@ -186,14 +230,18 @@ def get_department_satisfaction(period, department):
     JOIN departments d
         ON r.department_id=d.department_id
 
+    JOIN students s
+        ON r.student_id=s.student_id
+
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_mentor_rating(period, department):
+def get_mentor_rating(period, department, student):
 
     query = f"""
     SELECT
@@ -213,14 +261,18 @@ def get_mentor_rating(period, department):
     JOIN departments d
         ON r.department_id=d.department_id
 
+    JOIN students s
+        ON r.student_id=s.student_id
+
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_reserve_conversion(period, department):
+def get_reserve_conversion(period, department, student):
 
     query = f"""
     SELECT
@@ -245,14 +297,18 @@ def get_reserve_conversion(period, department):
     JOIN departments d
         ON r.department_id=d.department_id
 
+    JOIN students s
+        ON r.student_id=s.student_id
+
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_hr_queue(period, department):
+def get_hr_queue(period, department, student):
 
     query = f"""
     SELECT COUNT(*) AS hr_queue
@@ -262,8 +318,12 @@ def get_hr_queue(period, department):
     LEFT JOIN departments d
         ON p.department_id=d.department_id
 
+    LEFT JOIN students s
+        ON p.student_id=s.student_id
+
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
       AND current_status NOT IN (
             'Практика завершена',
             'Отказ'
@@ -272,55 +332,67 @@ def get_hr_queue(period, department):
 
     return pd.read_sql(query, engine)
 
-#Воронка процесса
+#Воронка процессов
 
-def get_process_funnel(period, department):
+def get_process_funnel(period, department, student):
 
     query = f"""
 
     SELECT
-        'Подана заявка' stage,
-        COUNT(*) cnt
+        'Подана заявка' AS stage,
+        COUNT(*) AS cnt
     FROM practice_requests p
     LEFT JOIN departments d
-        ON p.department_id=d.department_id
+        ON p.department_id = d.department_id
+    LEFT JOIN students s
+        ON p.student_id = s.student_id
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
 
     UNION ALL
 
     SELECT
-        'Рассмотрение HR',
-        COUNT(*)
+        'Рассмотрение HR' AS stage,
+        COUNT(*) AS cnt
     FROM practice_requests p
     LEFT JOIN departments d
-        ON p.department_id=d.department_id
+        ON p.department_id = d.department_id
+    LEFT JOIN students s
+        ON p.student_id = s.student_id
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
       AND current_status <> 'Новая заявка'
 
     UNION ALL
 
     SELECT
-        'Наставник назначен',
-        COUNT(*)
+        'Наставник назначен' AS stage,
+        COUNT(*) AS cnt
     FROM practice_requests p
     LEFT JOIN departments d
-        ON p.department_id=d.department_id
+        ON p.department_id = d.department_id
+    LEFT JOIN students s
+        ON p.student_id = s.student_id
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
       AND mentor_id IS NOT NULL
 
     UNION ALL
 
     SELECT
-        'Практика активна',
-        COUNT(*)
+        'Практика активна' AS stage,
+        COUNT(*) AS cnt
     FROM practice_requests p
     LEFT JOIN departments d
-        ON p.department_id=d.department_id
+        ON p.department_id = d.department_id
+    LEFT JOIN students s
+        ON p.student_id = s.student_id
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
       AND current_status IN (
             'Практика активна',
             'Практика завершена'
@@ -329,14 +401,17 @@ def get_process_funnel(period, department):
     UNION ALL
 
     SELECT
-        'Практика завершена',
-        COUNT(*)
+        'Практика завершена' AS stage,
+        COUNT(*) AS cnt
     FROM practice_requests p
     LEFT JOIN departments d
-        ON p.department_id=d.department_id
+        ON p.department_id = d.department_id
+    LEFT JOIN students s
+        ON p.student_id = s.student_id
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
-      AND current_status='Практика завершена'
+      AND {build_student_condition(student)}
+      AND current_status = 'Практика завершена'
 
     """
 
@@ -344,24 +419,37 @@ def get_process_funnel(period, department):
 
 #Время прохождения этапов
 
-def get_stage_duration():
+def get_stage_duration(period, department, student):
 
-    query = """
+    query = f"""
 
     WITH events AS (
 
         SELECT
-            request_id,
-            status_name,
-            changed_at,
+            sh.request_id,
+            sh.status_name,
+            sh.changed_at,
 
-            LEAD(changed_at)
+            LEAD(sh.changed_at)
             OVER(
-                PARTITION BY request_id
-                ORDER BY changed_at
+                PARTITION BY sh.request_id
+                ORDER BY sh.changed_at
             ) AS next_time
 
-        FROM status_history
+        FROM status_history sh
+
+        JOIN practice_requests p
+            ON sh.request_id = p.request_id
+
+        JOIN departments d
+            ON p.department_id = d.department_id
+
+        JOIN students s
+            ON p.student_id = s.student_id
+
+        WHERE {build_period_condition(period)}
+          AND {build_department_condition(department)}
+          AND {build_student_condition(student)}
     )
 
     SELECT
@@ -384,7 +472,7 @@ def get_stage_duration():
 
     GROUP BY status_name
 
-    ORDER BY avg_days DESC;
+    ORDER BY avg_days DESC
 
     """
 
@@ -392,7 +480,7 @@ def get_stage_duration():
 
 #Диаграммы
 
-def get_status_distribution(period, department):
+def get_status_distribution(period, department, student):
 
     query = f"""
     SELECT
@@ -403,10 +491,13 @@ def get_status_distribution(period, department):
 
     LEFT JOIN departments d
         ON p.department_id=d.department_id
+    
+    LEFT JOIN students s
+        ON p.student_id=s.student_id    
 
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
-
+      AND {build_student_condition(student)}
     GROUP BY current_status
     ORDER BY cnt DESC
     """
@@ -414,7 +505,7 @@ def get_status_distribution(period, department):
     return pd.read_sql(query, engine)
 
 
-def get_requests_by_month(period, department):
+def get_requests_by_month(period, department, student):
 
     query = f"""
     SELECT
@@ -425,9 +516,13 @@ def get_requests_by_month(period, department):
 
     LEFT JOIN departments d
         ON p.department_id=d.department_id
+    
+    LEFT JOIN students s
+        ON p.student_id=s.student_id
 
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
 
     GROUP BY month
     ORDER BY month
@@ -436,7 +531,7 @@ def get_requests_by_month(period, department):
     return pd.read_sql(query, engine)
 
 
-def get_reserve_chart(period, department):
+def get_reserve_chart(period, department, student):
 
     query = f"""
     SELECT
@@ -455,9 +550,13 @@ def get_reserve_chart(period, department):
 
     JOIN departments d
         ON r.department_id=d.department_id
+    
+    JOIN students s
+        ON r.student_id=s.student_id
 
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
 
     GROUP BY reserve_status
     """
@@ -466,22 +565,26 @@ def get_reserve_chart(period, department):
 
 #Университеты
 
-def get_university_distribution():
+def get_university_distribution(student):
 
-    query = """
+    query = f"""
     SELECT
         university,
         COUNT(*) AS cnt
-    FROM students
+
+    FROM students s
+
+    WHERE {build_student_condition(student)}
+
     GROUP BY university
-    ORDER BY cnt DESC;
+    ORDER BY cnt DESC
     """
 
     return pd.read_sql(query, engine)
 
 #Подразделения
 
-def get_department_distribution(period, department):
+def get_department_distribution(period, department, student):
 
     query = f"""
     SELECT
@@ -492,10 +595,13 @@ def get_department_distribution(period, department):
 
     JOIN departments d
         ON p.department_id=d.department_id
+    
+    JOIN students s
+        ON p.student_id=s.student_id
 
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
-
+      AND {build_student_condition(student)}
     GROUP BY d.name
     ORDER BY cnt DESC
     """
@@ -503,7 +609,7 @@ def get_department_distribution(period, department):
     return pd.read_sql(query, engine)
 
 
-def get_department_rating(period, department):
+def get_department_rating(period, department, student):
 
     query = f"""
     SELECT
@@ -522,9 +628,13 @@ def get_department_rating(period, department):
 
     JOIN departments d
         ON r.department_id=d.department_id
+    
+    JOIN students s
+        ON r.student_id=s.student_id
 
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
+      AND {build_student_condition(student)}
 
     GROUP BY d.name
     ORDER BY avg_score DESC
@@ -534,7 +644,7 @@ def get_department_rating(period, department):
 
 #Наставники
 
-def get_mentor_rating_table(period, department):
+def get_mentor_rating_table(period, department, student):
 
     query = f"""
     SELECT
@@ -556,10 +666,13 @@ def get_mentor_rating_table(period, department):
 
     JOIN departments d
         ON r.department_id=d.department_id
+    
+    JOIN students s
+        ON r.student_id=s.student_id
 
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
-
+      AND {build_student_condition(student)}
     GROUP BY m.full_name
     ORDER BY avg_score DESC
     """
