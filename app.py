@@ -80,18 +80,18 @@ with st.sidebar:
         ["Все студенты"] + students_filter["full_name"].tolist()
     )
 
-    status = st.selectbox(
-    "Статус",
-    [
-        "Все статусы",
-        "Новая заявка",
-        "На рассмотрении HR",
-        "На согласовании подразделения",
-        "Наставник назначен",
-        "Практика активна",
-        "Практика завершена",
-        "Отказ"
-    ]
+    selected_status = st.selectbox(
+        "Статус",
+        [
+            "Все статусы",
+            "Новая заявка",
+            "На рассмотрении HR",
+            "На согласовании подразделения",
+            "Наставник назначен",
+            "Практика активна",
+            "Практика завершена",
+            "Отказ"
+        ]
     )
 
     st.markdown("---")
@@ -138,21 +138,21 @@ st.divider()
 #KPI
 
 total_students = get_total_students(selected_student).iloc[0, 0]
-total_requests = get_total_requests(period, department, selected_student, status).iloc[0, 0]
+total_requests = get_total_requests(period, department, selected_student, selected_status).iloc[0, 0]
 
 active = get_active_practices(period, department, selected_student).iloc[0, 0]
 completed = get_completed_practices(period, department, selected_student).iloc[0, 0]
 
 avg_days = get_avg_processing_time(period, department, selected_student).iloc[0, 0]
 
-returns = get_document_return_rate(period, department, selected_student, status).iloc[0, 0]
+returns = get_document_return_rate(period, department, selected_student, selected_status).iloc[0, 0]
 
-student_sat = get_student_satisfaction(period, department, selected_student, status).iloc[0, 0]
-department_sat = get_department_satisfaction(period, department, selected_student, status).iloc[0, 0]
+student_sat = get_student_satisfaction(period, department, selected_student, selected_status).iloc[0, 0]
+department_sat = get_department_satisfaction(period, department, selected_student, selected_status).iloc[0, 0]
 
-mentor_rating = get_mentor_rating(period, department, selected_student, status).iloc[0, 0]
+mentor_rating = get_mentor_rating(period, department, selected_student, selected_status).iloc[0, 0]
 
-reserve = get_reserve_conversion(period, department, selected_student, status).iloc[0, 0]
+reserve = get_reserve_conversion(period, department, selected_student, selected_status).iloc[0, 0]
 
 hr_queue = get_hr_queue(period, department, selected_student).iloc[0, 0]
 
@@ -258,7 +258,7 @@ st.divider()
 
 st.subheader("Воронка процессов")
 
-funnel = get_process_funnel(period, department, selected_student, status)
+funnel = get_process_funnel(period, department, selected_student, selected_status)
 
 fig = px.funnel(
     funnel,
@@ -323,7 +323,7 @@ with left:
 
     st.subheader("Динамика заявок")
 
-    month = get_requests_by_month(period, department, selected_student, status)
+    month = get_requests_by_month(period, department, selected_student, selected_status)
 
     month.columns = [
         "Месяц",
@@ -371,14 +371,14 @@ with right:
 
     st.subheader("Статусы заявок")
 
-    status = get_status_distribution(period, department, selected_student, status)
-    status.columns = [
+    status_df = get_status_distribution(period, department, selected_student, selected_status)
+    status_df.columns = [
     "Статус заявки",
     "Количество"
     ]
 
     fig = px.pie(
-        status,
+        status_df,
         values="Количество",
         names="Статус заявки",
         hole=0.55
@@ -402,7 +402,7 @@ st.subheader(
     "Кадровый резерв"
 )
 
-reserve_chart = get_reserve_chart(period, department, selected_student, status)
+reserve_chart = get_reserve_chart(period, department, selected_student, selected_status)
 reserve_chart.columns = [
     "Статус",
     "Количество"
@@ -466,7 +466,7 @@ with right:
         "Подразделения"
     )
 
-    departments = get_department_distribution(period, department, selected_student, status)
+    departments = get_department_distribution(period, department, selected_student, selected_status)
     departments.columns = [
     "Подразделение",
     "Количество практикантов"
@@ -490,7 +490,7 @@ with left:
         "Рейтинг подразделений"
     )
 
-    dep_rating = get_department_rating(period, department, selected_student, status)
+    dep_rating = get_department_rating(period, department, selected_student, selected_status)
     dep_rating.columns = [
     "Подразделение",
     "Студентов",
@@ -509,7 +509,7 @@ with right:
         "Рейтинг наставников"
     )
 
-    mentor_table = get_mentor_rating_table(period, department, selected_student, status)
+    mentor_table = get_mentor_rating_table(period, department, selected_student, selected_status)
     mentor_table.columns = [
     "Наставник",
     "Студентов",
@@ -556,7 +556,7 @@ students = pd.read_sql(
 
     WHERE {build_student_condition(selected_student)}
       AND {build_department_condition(department)}
-      AND {build_status_condition(status)}
+      AND {build_status_condition(selected_status)}
 
     ORDER BY s.student_id
 
