@@ -31,12 +31,12 @@ def build_student_condition(student):
 
     return f"s.full_name = '{student}'"
 
-def build_status_condition(status):
+def build_status_condition(status, alias="p"):
 
     if status == "Все статусы":
         return "1=1"
 
-    return f"p.current_status = '{status}'"
+    return f"{alias}.current_status = '{status}'"
 
 #KPI
 
@@ -214,7 +214,7 @@ def get_student_satisfaction(period, department, student, status):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
-      AND {build_status_condition(status)}
+      AND {build_status_condition(status, "r")}
     """
 
     return pd.read_sql(query, engine)
@@ -246,13 +246,13 @@ def get_department_satisfaction(period, department, student, status):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
-      AND {build_status_condition(status)}
+      AND {build_status_condition(status, "r")}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_mentor_rating(period, department, student):
+def get_mentor_rating(period, department, student, status):
 
     query = f"""
     SELECT
@@ -278,6 +278,7 @@ def get_mentor_rating(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status, "r")}
     """
 
     return pd.read_sql(query, engine)
@@ -314,7 +315,7 @@ def get_reserve_conversion(period, department, student, status):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
-      AND {build_status_condition(status)}
+      AND {build_status_condition(status, "r")}
     """
 
     return pd.read_sql(query, engine)
@@ -576,7 +577,7 @@ def get_reserve_chart(period, department, student, status):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
-      AND {build_status_condition(status)}
+      AND {build_status_condition(status, "r")}
     GROUP BY reserve_status
     """
 
@@ -655,7 +656,7 @@ def get_department_rating(period, department, student, status):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
-      AND {build_status_condition(status)}
+      AND {build_status_condition(status, "r")}
     GROUP BY d.name
     ORDER BY avg_score DESC
     """
@@ -693,7 +694,7 @@ def get_mentor_rating_table(period, department, student, status):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
-      AND {build_status_condition(status)}
+      AND {build_status_condition(status, "r")}
     GROUP BY m.full_name
     ORDER BY avg_score DESC
     """

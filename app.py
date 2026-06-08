@@ -150,7 +150,7 @@ returns = get_document_return_rate(period, department, selected_student, status)
 student_sat = get_student_satisfaction(period, department, selected_student, status).iloc[0, 0]
 department_sat = get_department_satisfaction(period, department, selected_student, status).iloc[0, 0]
 
-mentor_rating = get_mentor_rating(period, department, selected_student).iloc[0, 0]
+mentor_rating = get_mentor_rating(period, department, selected_student, status).iloc[0, 0]
 
 reserve = get_reserve_conversion(period, department, selected_student, status).iloc[0, 0]
 
