@@ -31,6 +31,13 @@ def build_student_condition(student):
 
     return f"s.full_name = '{student}'"
 
+def build_status_condition(status):
+
+    if status == "Все статусы":
+        return "1=1"
+
+    return f"p.current_status = '{status}'"
+
 #KPI
 
 def get_total_students(student):
@@ -46,7 +53,7 @@ def get_total_students(student):
     return pd.read_sql(query, engine)
 
 
-def get_total_requests(period, department, student):
+def get_total_requests(period, department, student, status):
 
     query = f"""
     SELECT COUNT(*) AS total_requests
@@ -62,6 +69,7 @@ def get_total_requests(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
     """
 
     return pd.read_sql(query, engine)
@@ -142,7 +150,7 @@ def get_avg_processing_time(period, department, student):
     return pd.read_sql(query, engine)
 
 
-def get_document_return_rate(period, department, student):
+def get_document_return_rate(period, department, student, status):
 
     query = f"""
     SELECT
@@ -174,12 +182,13 @@ def get_document_return_rate(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_student_satisfaction(period, department, student):
+def get_student_satisfaction(period, department, student, status):
 
     query = f"""
     SELECT
@@ -205,12 +214,13 @@ def get_student_satisfaction(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
     """
 
     return pd.read_sql(query, engine)
 
 
-def get_department_satisfaction(period, department, student):
+def get_department_satisfaction(period, department, student, status):
 
     query = f"""
     SELECT
@@ -236,6 +246,7 @@ def get_department_satisfaction(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
     """
 
     return pd.read_sql(query, engine)
@@ -272,7 +283,7 @@ def get_mentor_rating(period, department, student):
     return pd.read_sql(query, engine)
 
 
-def get_reserve_conversion(period, department, student):
+def get_reserve_conversion(period, department, student, status):
 
     query = f"""
     SELECT
@@ -303,6 +314,7 @@ def get_reserve_conversion(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
     """
 
     return pd.read_sql(query, engine)
@@ -334,7 +346,7 @@ def get_hr_queue(period, department, student):
 
 #Воронка процессов
 
-def get_process_funnel(period, department, student):
+def get_process_funnel(period, department, student, status):
 
     query = f"""
 
@@ -349,7 +361,8 @@ def get_process_funnel(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
-
+      AND {build_status_condition(status)}
+      
     UNION ALL
 
     SELECT
@@ -363,6 +376,7 @@ def get_process_funnel(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
       AND current_status <> 'Новая заявка'
 
     UNION ALL
@@ -378,6 +392,7 @@ def get_process_funnel(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
       AND mentor_id IS NOT NULL
 
     UNION ALL
@@ -393,6 +408,7 @@ def get_process_funnel(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
       AND current_status IN (
             'Практика активна',
             'Практика завершена'
@@ -411,6 +427,7 @@ def get_process_funnel(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
       AND current_status = 'Практика завершена'
 
     """
@@ -480,7 +497,7 @@ def get_stage_duration(period, department, student):
 
 #Диаграммы
 
-def get_status_distribution(period, department, student):
+def get_status_distribution(period, department, student, status):
 
     query = f"""
     SELECT
@@ -498,6 +515,7 @@ def get_status_distribution(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
     GROUP BY current_status
     ORDER BY cnt DESC
     """
@@ -505,7 +523,7 @@ def get_status_distribution(period, department, student):
     return pd.read_sql(query, engine)
 
 
-def get_requests_by_month(period, department, student):
+def get_requests_by_month(period, department, student, status):
 
     query = f"""
     SELECT
@@ -523,6 +541,7 @@ def get_requests_by_month(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
 
     GROUP BY month
     ORDER BY month
@@ -531,7 +550,7 @@ def get_requests_by_month(period, department, student):
     return pd.read_sql(query, engine)
 
 
-def get_reserve_chart(period, department, student):
+def get_reserve_chart(period, department, student, status):
 
     query = f"""
     SELECT
@@ -557,7 +576,7 @@ def get_reserve_chart(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
-
+      AND {build_status_condition(status)}
     GROUP BY reserve_status
     """
 
@@ -584,7 +603,7 @@ def get_university_distribution(student):
 
 #Подразделения
 
-def get_department_distribution(period, department, student):
+def get_department_distribution(period, department, student, status):
 
     query = f"""
     SELECT
@@ -602,6 +621,7 @@ def get_department_distribution(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
     GROUP BY d.name
     ORDER BY cnt DESC
     """
@@ -609,7 +629,7 @@ def get_department_distribution(period, department, student):
     return pd.read_sql(query, engine)
 
 
-def get_department_rating(period, department, student):
+def get_department_rating(period, department, student, status):
 
     query = f"""
     SELECT
@@ -635,7 +655,7 @@ def get_department_rating(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
-
+      AND {build_status_condition(status)}
     GROUP BY d.name
     ORDER BY avg_score DESC
     """
@@ -644,7 +664,7 @@ def get_department_rating(period, department, student):
 
 #Наставники
 
-def get_mentor_rating_table(period, department, student):
+def get_mentor_rating_table(period, department, student, status):
 
     query = f"""
     SELECT
@@ -673,6 +693,7 @@ def get_mentor_rating_table(period, department, student):
     WHERE {build_period_condition(period)}
       AND {build_department_condition(department)}
       AND {build_student_condition(student)}
+      AND {build_status_condition(status)}
     GROUP BY m.full_name
     ORDER BY avg_score DESC
     """
