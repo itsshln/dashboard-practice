@@ -7,49 +7,49 @@ def build_period_condition(period):
         return "1=1"
 
     periods = {
-        "2023 год": "EXTRACT(YEAR FROM p.created_at)=2023",
+        "2023 год": "EXTRACT(YEAR FROM created_at)=2023",
 
         "I квартал 2023":
-        "EXTRACT(YEAR FROM p.created_at)=2023 AND EXTRACT(QUARTER FROM p.created_at)=1",
+        "EXTRACT(YEAR FROM created_at)=2023 AND EXTRACT(QUARTER FROM created_at)=1",
 
         "II квартал 2023":
-        "EXTRACT(YEAR FROM p.created_at)=2023 AND EXTRACT(QUARTER FROM p.created_at)=2",
+        "EXTRACT(YEAR FROM created_at)=2023 AND EXTRACT(QUARTER FROM created_at)=2",
 
         "III квартал 2023":
-        "EXTRACT(YEAR FROM p.created_at)=2023 AND EXTRACT(QUARTER FROM p.created_at)=3",
+        "EXTRACT(YEAR FROM created_at)=2023 AND EXTRACT(QUARTER FROM created_at)=3",
 
         "IV квартал 2023":
-        "EXTRACT(YEAR FROM p.created_at)=2023 AND EXTRACT(QUARTER FROM p.created_at)=4",
+        "EXTRACT(YEAR FROM created_at)=2023 AND EXTRACT(QUARTER FROM created_at)=4",
 
         "2024 год":
-        "EXTRACT(YEAR FROM p.created_at)=2024",
+        "EXTRACT(YEAR FROM created_at)=2024",
 
         "I квартал 2024":
-        "EXTRACT(YEAR FROM p.created_at)=2024 AND EXTRACT(QUARTER FROM p.created_at)=1",
+        "EXTRACT(YEAR FROM created_at)=2024 AND EXTRACT(QUARTER FROM created_at)=1",
 
         "II квартал 2024":
-        "EXTRACT(YEAR FROM p.created_at)=2024 AND EXTRACT(QUARTER FROM p.created_at)=2",
+        "EXTRACT(YEAR FROM created_at)=2024 AND EXTRACT(QUARTER FROM created_at)=2",
 
         "III квартал 2024":
-        "EXTRACT(YEAR FROM p.created_at)=2024 AND EXTRACT(QUARTER FROM p.created_at)=3",
+        "EXTRACT(YEAR FROM created_at)=2024 AND EXTRACT(QUARTER FROM created_at)=3",
 
         "IV квартал 2024":
-        "EXTRACT(YEAR FROM p.created_at)=2024 AND EXTRACT(QUARTER FROM p.created_at)=4",
+        "EXTRACT(YEAR FROM created_at)=2024 AND EXTRACT(QUARTER FROM created_at)=4",
 
         "2025 год":
-        "EXTRACT(YEAR FROM p.created_at)=2025",
+        "EXTRACT(YEAR FROM created_at)=2025",
 
         "I квартал 2025":
-        "EXTRACT(YEAR FROM p.created_at)=2025 AND EXTRACT(QUARTER FROM p.created_at)=1",
+        "EXTRACT(YEAR FROM created_at)=2025 AND EXTRACT(QUARTER FROM created_at)=1",
 
         "II квартал 2025":
-        "EXTRACT(YEAR FROM p.created_at)=2025 AND EXTRACT(QUARTER FROM p.created_at)=2",
+        "EXTRACT(YEAR FROM created_at)=2025 AND EXTRACT(QUARTER FROM created_at)=2",
 
         "III квартал 2025":
-        "EXTRACT(YEAR FROM p.created_at)=2025 AND EXTRACT(QUARTER FROM p.created_at)=3",
+        "EXTRACT(YEAR FROM created_at)=2025 AND EXTRACT(QUARTER FROM created_at)=3",
 
         "IV квартал 2025":
-        "EXTRACT(YEAR FROM p.created_at)=2025 AND EXTRACT(QUARTER FROM p.created_at)=4",
+        "EXTRACT(YEAR FROM created_at)=2025 AND EXTRACT(QUARTER FROM created_at)=4",
     }
 
     return periods.get(period, "1=1")
