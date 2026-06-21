@@ -3,19 +3,56 @@ from database import engine
 
 def build_period_condition(period):
 
-    if period == "I квартал":
-        return "EXTRACT(QUARTER FROM created_at)=1"
+    if period == "Все периоды":
+        return "1=1"
 
-    elif period == "II квартал":
-        return "EXTRACT(QUARTER FROM created_at)=2"
+    periods = {
+        "2023 год": "EXTRACT(YEAR FROM p.created_at)=2023",
 
-    elif period == "III квартал":
-        return "EXTRACT(QUARTER FROM created_at)=3"
+        "I квартал 2023":
+        "EXTRACT(YEAR FROM p.created_at)=2023 AND EXTRACT(QUARTER FROM p.created_at)=1",
 
-    elif period == "IV квартал":
-        return "EXTRACT(QUARTER FROM created_at)=4"
+        "II квартал 2023":
+        "EXTRACT(YEAR FROM p.created_at)=2023 AND EXTRACT(QUARTER FROM p.created_at)=2",
 
-    return "1=1"
+        "III квартал 2023":
+        "EXTRACT(YEAR FROM p.created_at)=2023 AND EXTRACT(QUARTER FROM p.created_at)=3",
+
+        "IV квартал 2023":
+        "EXTRACT(YEAR FROM p.created_at)=2023 AND EXTRACT(QUARTER FROM p.created_at)=4",
+
+        "2024 год":
+        "EXTRACT(YEAR FROM p.created_at)=2024",
+
+        "I квартал 2024":
+        "EXTRACT(YEAR FROM p.created_at)=2024 AND EXTRACT(QUARTER FROM p.created_at)=1",
+
+        "II квартал 2024":
+        "EXTRACT(YEAR FROM p.created_at)=2024 AND EXTRACT(QUARTER FROM p.created_at)=2",
+
+        "III квартал 2024":
+        "EXTRACT(YEAR FROM p.created_at)=2024 AND EXTRACT(QUARTER FROM p.created_at)=3",
+
+        "IV квартал 2024":
+        "EXTRACT(YEAR FROM p.created_at)=2024 AND EXTRACT(QUARTER FROM p.created_at)=4",
+
+        "2025 год":
+        "EXTRACT(YEAR FROM p.created_at)=2025",
+
+        "I квартал 2025":
+        "EXTRACT(YEAR FROM p.created_at)=2025 AND EXTRACT(QUARTER FROM p.created_at)=1",
+
+        "II квартал 2025":
+        "EXTRACT(YEAR FROM p.created_at)=2025 AND EXTRACT(QUARTER FROM p.created_at)=2",
+
+        "III квартал 2025":
+        "EXTRACT(YEAR FROM p.created_at)=2025 AND EXTRACT(QUARTER FROM p.created_at)=3",
+
+        "IV квартал 2025":
+        "EXTRACT(YEAR FROM p.created_at)=2025 AND EXTRACT(QUARTER FROM p.created_at)=4",
+    }
+
+    return periods.get(period, "1=1")
 
 def build_department_condition(department):
 
