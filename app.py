@@ -332,35 +332,28 @@ st.divider()
 #Динамика + статусы
 
 left, right = st.columns(2)
+
 with left:
 
     st.subheader("Динамика заявок")
 
-    month = get_requests_by_month(period, department, selected_student, selected_status)
+    month = get_requests_by_month(
+        period,
+        department,
+        selected_student,
+        selected_status
+    )
 
     month.columns = [
         "Месяц",
         "Количество заявок"
     ]
 
-    months_ru = {
-        "January": "Январь",
-        "February": "Февраль",
-        "March": "Март",
-        "April": "Апрель",
-        "May": "Май",
-        "June": "Июнь",
-        "July": "Июль",
-        "August": "Август",
-        "September": "Сентябрь",
-        "October": "Октябрь",
-        "November": "Ноябрь",
-        "December": "Декабрь"
-    }
-
     month["Месяц"] = pd.to_datetime(
         month["Месяц"]
-    ).dt.strftime("%B").replace(months_ru)
+    )
+
+    month = month.sort_values("Месяц")
 
     fig = px.line(
         month,
@@ -371,8 +364,12 @@ with left:
 
     fig.update_layout(
         height=400,
-        xaxis_title="Месяц",
+        xaxis_title="Период",
         yaxis_title="Количество заявок"
+    )
+
+    fig.update_xaxes(
+        tickformat="%m.%Y"
     )
 
     st.plotly_chart(
@@ -384,10 +381,16 @@ with right:
 
     st.subheader("Статусы заявок")
 
-    status_df = get_status_distribution(period, department, selected_student, selected_status)
+    status_df = get_status_distribution(
+        period,
+        department,
+        selected_student,
+        selected_status
+    )
+
     status_df.columns = [
-    "Статус заявки",
-    "Количество"
+        "Статус заявки",
+        "Количество"
     ]
 
     fig = px.pie(
@@ -398,8 +401,8 @@ with right:
     )
 
     fig.update_layout(
-    height=400,
-    legend_title="Статус заявки"
+        height=400,
+        legend_title="Статус заявки"
     )
 
     st.plotly_chart(
