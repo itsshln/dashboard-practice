@@ -32,7 +32,7 @@ with st.sidebar:
 
     try:
         st.image(
-            "assets/fesco_logo.png",
+            "/Users/user/Documents/student_practice_dashboard/assets/fesco_logo.png",
             use_container_width=True
         )
     except:
@@ -115,7 +115,7 @@ with st.sidebar:
 
         • KPI и эффективность
 
-        • Воронка процесса
+        • Воронка процессов
 
         • SLA и сроки
 
